@@ -146,7 +146,7 @@ def split_text_by_paragraph(text, max_chunk_size=600):
 # 返回切分完成的所有文本块列表，后续就可以循环这个列表，向 ChromaDB add 文本 + 向量
 
 # ================= 5. 页面布局 =================
-st.title("智能 PDF 论文助手 (混合检索)")
+st.title("ScholarRAG：学术级抗幻觉文献解析系统")
 # `st.title()`：Streamlit 的页面大标题，渲染在网页主内容区最上方。
 
 with st.sidebar:
