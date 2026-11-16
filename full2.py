@@ -33,7 +33,7 @@ from openai import OpenAI
 client = OpenAI(
     # 只要你想用 OpenAI 的 SDK（openai 这个库）去调用它的接口（embedding、chat.completions、图像等）
     api_key = st.secrets.get("DASHSCOPE_API_KEY", os.getenv("DASHSCOPE_API_KEY")),
-    base_url="https://ws-guf27zl5m8zvagh9.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
 )
 
 # ================= 2. 计算向量的工具函数 =================
@@ -53,7 +53,7 @@ def get_embeddings(texts, batch_size=10):
             response = client.embeddings.create(
 # 服务器处理完，会返回一大包结构化数据（包含每条文本对应的 embedding 向量、使用 token 数等）
 # 把这包结果赋值给 `response`，后面我们从里面把向量取出来。
-                model="tongyi-embedding-vision-plus-2026-03-06",
+                model="text-embedding-v3",
                 input=batch,
                 # `input` 是接口规定的参数，接收你要转向量的文本；这里传的就是上一句切块得到的 `batch`（一小批文本列表），刚好对应我们分批循环的逻辑。
                 encoding_format="float"
@@ -286,7 +286,7 @@ if prompt_text := st.chat_input("请输入关于该 PDF 的问题："):
             # 4. 生成回答
             try:
                 response = client.chat.completions.create(
-                    model="qwen-vl-ocr-2025-11-20",
+                    model="qwen-plus",
                     messages=messages_to_send,
                     temperature=0.1
                     # 温度参数，**越低越严谨、随机性越小、越忠于原文**；
