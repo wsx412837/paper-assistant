@@ -53,7 +53,7 @@ def get_embeddings(texts, batch_size=10):
             response = client.embeddings.create(
 # 服务器处理完，会返回一大包结构化数据（包含每条文本对应的 embedding 向量、使用 token 数等）
 # 把这包结果赋值给 `response`，后面我们从里面把向量取出来。
-                model="text-embedding-v3",
+                model="text-embedding-v4",
                 input=batch,
                 # `input` 是接口规定的参数，接收你要转向量的文本；这里传的就是上一句切块得到的 `batch`（一小批文本列表），刚好对应我们分批循环的逻辑。
                 encoding_format="float"
