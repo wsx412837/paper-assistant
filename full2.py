@@ -10,7 +10,6 @@ import streamlit as st
 # 导入 `streamlit` 库
 # Streamlit，Python 快速 Web 可视化框架，不需要写 HTML/JS，只用几行 Python 就能生成网页界面、输入框、聊天框、按钮，用来做这个 RAG 应用的前端页面。
 # 安装命令：`pip install streamlit`
-import chromadb
 import re
 import os
 # 导入 Python 内置`os`模块
@@ -74,12 +73,12 @@ def get_embeddings(texts, batch_size=10):
 
 # ================= 3. 初始化 ChromaDB =================
 if "collection" not in st.session_state:
-    client = chromadb.EphemeralClient()
-    try:
-        client.delete_collection(name="pdf_notes")
-    except Exception:
-        pass
-    st.session_state.collection = client.get_or_create_collection(name="pdf_notes")
+    # 不加这个判断，每次交互都会重复创建数据库集合，引发报错、数据丢失。
+    chroma_client = chromadb.Client()
+    # 如果想要持久化保存，要写成 `chromadb.PersistentClient(path="./chroma_db")`，数据会存在本地文件夹
+    st.session_state.collection = chroma_client.get_or_create_collection(name="pdf_notes")
+    # collection 是 ChromaDB 的核心单元：用来存放文本、文本向量（embedding）、元数据 metadata；
+    # RAG 里一般一个业务文档库对应一个 collection
 collection = st.session_state.collection
 # 从会话状态取出之前保存好的向量集合，赋值给局部变量 `collection`
 # 方便后面代码直接写 `collection.add()`、`collection.query()` 来存入文本、做向量检索。
@@ -227,6 +226,8 @@ if prompt_text := st.chat_input("请输入关于该 PDF 的问题："):
 # 所以要把单个问题包成列表 `[prompt_text]`
 # 返回是 `[向量1]`，取 `[0]` 拿到这一条问题对应的一维向量
             results = collection.query(
+                 query_embeddings=[query_embedding],
+    n_results=4
                 # 返回值 `results` 是一个嵌套字典，里面包含：匹配到的文本、metadata（文件名、页码）、距离分数等
                 # `collection.query()` 是 ChromaDB 的相似度检索 API
                 # `query_embeddings`：传入向量列表（所以外面套一层`[]`）
