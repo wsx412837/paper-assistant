@@ -4,10 +4,10 @@ try:
     import sys
     sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 except ImportError:
-    # Windows 本地环境没有 pysqlite3，继续使用系统自带的 sqlite3
+    # Windows 本地环境没有 pysqlite3，使用系统自带的 sqlite3
     pass
 import streamlit as st
-# 导入 `streamlit` 库，并起别名 `st`
+# 导入 `streamlit` 库
 # Streamlit，Python 快速 Web 可视化框架，不需要写 HTML/JS，只用几行 Python 就能生成网页界面、输入框、聊天框、按钮，用来做这个 RAG 应用的前端页面。
 # 安装命令：`pip install streamlit`
 import re
@@ -61,7 +61,6 @@ def get_embeddings(texts, batch_size=10):
             )
             all_embeddings.extend([data.embedding for data in response.data])
             # data.embedding for data in response.dreata：列表推导式（list comprehension），是 Python 简写循环、快速生成列表的写法。
-            # 即从response.data之中取出data，然后将data的值交给前面的data.embedding表达式，执行赋予向量操作
             # `extend()`：把本轮向量追加到总列表
         except Exception as e:
             # 只要 try 里面任意代码抛出异常，就执行这里
@@ -229,9 +228,7 @@ if prompt_text := st.chat_input("请输入关于该 PDF 的问题："):
             results = collection.query(
                 # 返回值 `results` 是一个嵌套字典，里面包含：匹配到的文本、metadata（文件名、页码）、距离分数等
                 # `collection.query()` 是 ChromaDB 的相似度检索 API
-                query_embeddings=[query_embedding],
                 # `query_embeddings`：传入向量列表（所以外面套一层`[]`）
-                n_results=4
                 # `n_results=4`：检索返回相似度最高的**4 个 chunk**
             )
             
@@ -241,7 +238,6 @@ if prompt_text := st.chat_input("请输入关于该 PDF 的问题："):
                 # Chroma 的 `collection.query()` 返回的 results 里，`results["documents"]` 是一个双层嵌套列表
 # 判断：向量检索**确实拿到了至少一条匹配到的文本片段**。防止检索为空的时候，后面循环、取内容出现异常或者无效拼接。
 # 先看有没有这一层容器，再看容器里面有没有真正的片段。
-
 # **语义相似检索**：哪怕用词不完全一样、同义改写，也能匹配出来；缺点是有时候会语义漂移，漏掉专业术语。
                 for i in range(len(results['documents'][0])):
                     text = results['documents'][0][i]
