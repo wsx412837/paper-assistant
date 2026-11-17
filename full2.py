@@ -73,12 +73,12 @@ def get_embeddings(texts, batch_size=10):
 
 # ================= 3. 初始化 ChromaDB =================
 if "collection" not in st.session_state:
-    # 不加这个判断，每次交互都会重复创建数据库集合，引发报错、数据丢失。
     chroma_client = chromadb.Client()
-    # 如果想要持久化保存，要写成 `chromadb.PersistentClient(path="./chroma_db")`，数据会存在本地文件夹
+    try:
+        chroma_client.delete_collection(name="pdf_notes")
+    except Exception:
+        pass
     st.session_state.collection = chroma_client.get_or_create_collection(name="pdf_notes")
-    # collection 是 ChromaDB 的核心单元：用来存放文本、文本向量（embedding）、元数据 metadata；
-    # RAG 里一般一个业务文档库对应一个 collection
 collection = st.session_state.collection
 # 从会话状态取出之前保存好的向量集合，赋值给局部变量 `collection`
 # 方便后面代码直接写 `collection.add()`、`collection.query()` 来存入文本、做向量检索。
