@@ -25,7 +25,7 @@ pip install -r requirements.txt
 streamlit run full2.py
 
 ## 在线体验地址
-[点击访问 ScholarRAG 在线演示](这里是 Streamlit 公网链接)
+[点击访问 ScholarRAG 在线演示](Streamlit 公网链接:https://paper-assistant-kjgkgryeqsdhyvcapbdtjz.streamlit.app/)
  
 ### 项目说明：
 本项目为面向科研场景的RAG文献问答系统，区别于通用大模型，回答严格限定在上传的PDF文献内容范围内。
