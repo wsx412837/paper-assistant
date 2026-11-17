@@ -10,6 +10,7 @@ import streamlit as st
 # 导入 `streamlit` 库
 # Streamlit，Python 快速 Web 可视化框架，不需要写 HTML/JS，只用几行 Python 就能生成网页界面、输入框、聊天框、按钮，用来做这个 RAG 应用的前端页面。
 # 安装命令：`pip install streamlit`
+import chromadb
 import re
 import os
 # 导入 Python 内置`os`模块
@@ -73,12 +74,12 @@ def get_embeddings(texts, batch_size=10):
 
 # ================= 3. 初始化 ChromaDB =================
 if "collection" not in st.session_state:
-    chroma_client = chromadb.Client()
+    client = chromadb.EphemeralClient()
     try:
-        chroma_client.delete_collection(name="pdf_notes")
+        client.delete_collection(name="pdf_notes")
     except Exception:
         pass
-    st.session_state.collection = chroma_client.get_or_create_collection(name="pdf_notes")
+    st.session_state.collection = client.get_or_create_collection(name="pdf_notes")
 collection = st.session_state.collection
 # 从会话状态取出之前保存好的向量集合，赋值给局部变量 `collection`
 # 方便后面代码直接写 `collection.add()`、`collection.query()` 来存入文本、做向量检索。
